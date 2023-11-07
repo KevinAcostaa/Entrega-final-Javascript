@@ -1,0 +1,58 @@
+body{
+    margin: 0;
+}
+.botones{
+
+    text-align: center;
+}
+
+.style__botones2{
+
+    padding: 8px;
+    border-radius: 10px;
+}
+
+.container_title{
+    background-color: #89b4d8;
+    padding: 25px;
+}
+
+.div__container{
+
+    background-color: #afd4f1;
+    padding-left: 16rem;
+}
+
+.mititle{
+
+    text-align: center;
+}
+
+ul{
+    list-style: none;
+    display: flex;
+    flex-direction: row;
+}
+
+li{
+    display: inline;
+    margin: 20px;
+}
+
+.listContainer{
+    padding: 80px;
+    background-color: #afd4f1;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.footer_conteiner{
+    background-color: #89b4d8;
+    padding: 100px;
+    margin: 0;
+
+}
+
+.datosContainer{
+    background-color:  #afd4f1;
+}
