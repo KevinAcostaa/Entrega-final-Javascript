@@ -91,7 +91,6 @@ const contenedor = document.getElementById("contenedorDatos");
 
 
 
-
 document.addEventListener("DOMContentLoaded", function () {
     
     miObjeto.forEach(empleado => {
@@ -101,7 +100,15 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-
+const cargarEmpleados = () => {
+    document.addEventListener("DOMContentLoaded", () => {
+        miObjeto.forEach(empleado => {
+        const elemento = document.createElement('p');
+        elemento.textContent = `${empleado.nombre} ${empleado.puesto} ${empleado.edad} ${empleado.sueldo}`;
+        contenedor.appendChild(elemento);
+    });
+    });
+};
 
 
 
@@ -111,21 +118,53 @@ const agregarBtn = document.getElementById("agregar");
 
 // Función para crear y agregar empleados al array
 
+
 const agregarEmpleado = () => {
+    Swal.fire({
+    title: "Ingrese el nombre del empleado",
+    input: "text",
+    showCancelButton: true,
+    inputValidator: (value) => {
+        if (!value) {
+        return "¡Debe ingresar un nombre!";
+        }
+        let nombre = value;
 
-    let nombre = prompt("Ingrese el nombre del empleado");
-    let puesto = prompt("Ingrese el puesto del empleado");
-    let edad = parseInt(prompt("Ingrese la edad del empleado"));
+        Swal.fire({
+            title: "Ingrese el puesto del empleado",
+            input: "text",
+            showCancelButton: true,
+            inputValidator: (value) => {
+            if (!value) {
+                return "¡Debe ingresar un puesto!";
+            }
+            let puesto = value;
 
+            Swal.fire({
+                title: "Ingrese la edad del empleado",
+                input: "number",
+                showCancelButton: true,
+                inputValidator: (value) => {
+                if (isNaN(value) || value < 0) {
+                    return "¡Debe ingresar una edad válida!";
+                }
+                let edad = parseInt(value);
 
-    let empleado = new Empleado(nombre, puesto, edad);
+                let empleado = new Empleado(nombre, puesto, edad);
 
-  // Agregamos el empleado en el array empelados
-    empleados.push(empleado);
+                // Agregamos el empleado en el array empleados
+                empleados.push(empleado);
+                localStorage.setItem("empleados", JSON.stringify(empleados));
 
+                mostrarEmpleados(empleados);
+                },
+            });
+            },
+        });
+        },
+    });
+    };
 
-    mostrarEmpleados(empleados);
-};
 
 
 
@@ -143,23 +182,28 @@ const eliminarEmpleado = () => {
 
     if (!empleadoBuscado) return;
 
-    const confirmacion = confirm(
-    `Estas seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`
-    );
+    Swal.fire({
+        title: `¿Estás seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Sí, eliminar",
+        cancelButtonText: "Cancelar",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            empleados = empleados.filter(
+                (empleado) =>
+                    empleado.nombre.toLowerCase() !== empleadoBuscado.nombre.toLowerCase()
+            );
+            mostrarEmpleados(empleados);
+            Swal.fire("Eliminado", `El empleado ${empleadoBuscado.nombre} ha sido eliminado.`, "success");
+            localStorage.setItem("empleados", JSON.stringify(empleados));
+        } else {
+            Swal.fire("Cancelado", "Eliminación cancelada", "info");
+        }
+    });
 
-    if (confirmacion) {
-    empleados = empleados.filter(
-        (empleado) =>
-        empleado.nombre.toLowerCase() !== empleadoBuscado.nombre.toLowerCase()
-    );
-    mostrarEmpleados(empleados);
-    } else {
-    alert("Eliminación cancelada");
-    }
+    localStorage.setItem("empleados", JSON.stringify(empleados))
 };
-
-
-
 
 
 const editarEmpleado = () => {
@@ -167,31 +211,81 @@ const editarEmpleado = () => {
 
     if (!empleadoBuscado) return;
 
-    alert(
-    "Menú editar empleado:\n1 - Editar nombre\n2 - Editar puesto\n3 - Editar edad"
-    );
+    Swal.fire({
+        title: "Menú editar empleado",
+        text: "Seleccione una opción para editar:",
+        icon: "info",
+        input: "select",
+        inputOptions: {
+            1: "Editar nombre",
+            2: "Editar puesto",
+            3: "Editar edad",
+        },
+        showCancelButton: true,
+        inputValidator: (value) => {
+            if (value !== "1" && value !== "2" && value !== "3") {
+                return "Por favor, seleccione una opción válida.";
+            }
+        },
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const opcion = result.value;
+            switch (opcion) {
+                case "1":
+                    Swal.fire({
+                        title: "Ingrese el nombre del empleado",
+                        input: "text",
+                        showCancelButton: true,
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return "¡Debe ingresar un nombre!";
+                            }
+                            empleadoBuscado.cambiarNombre(value);
+                            actualizarYMostrarEmpleados();
+                        },
+                    });
+                    break;
+                case "2":
+                    Swal.fire({
+                        title: "Ingrese el puesto del empleado",
+                        input: "text",
+                        showCancelButton: true,
+                        inputValidator: (value) => {
+                            if (!value) {
+                                return "¡Debe ingresar un puesto!";
+                            }
+                            empleadoBuscado.cambiarPuesto(value);
+                            actualizarYMostrarEmpleados();
+                        },
+                    });
+                    break;
+                case "3":
+                    Swal.fire({
+                        title: "Ingrese la edad del empleado",
+                        input: "number",
+                        showCancelButton: true,
+                        inputValidator: (value) => {
+                            if (isNaN(value) || value < 0) {
+                                return "¡Debe ingresar una edad válida!";
+                            }
+                            empleadoBuscado.cambiarEdad(parseInt(value));
+                            actualizarYMostrarEmpleados();
+                        },
+                    });
+                    break;
+                default:
+                    alert("Ingrese una opción correcta");
+            }
+        }
+    });
+};
 
-    let opcion = parseInt(prompt("Ingrese una opción para editar"));
-
-    switch (opcion) {
-    case 1:
-        let nombre = prompt("Ingrese el nombre del empleado");
-        empleadoBuscado.cambiarNombre(nombre);
-        break;
-    case 2:
-        let puesto = prompt("Ingrese el puesto del empleado");
-        empleadoBuscado.cambiarPuesto(puesto);
-        break;
-    case 3:
-        let edad = parseInt(prompt("Ingrese la edad del empleado"));
-        empleadoBuscado.cambiarEdad(edad);
-        break;
-    default:
-        alert("Ingrese una opción correcta");
-    }
-
+const actualizarYMostrarEmpleados = () => {
+    localStorage.setItem("empleados", JSON.stringify(empleados));
     mostrarEmpleados(empleados);
 };
+
+
 
 const Btn3 = document.getElementById("editar");
     Btn3.addEventListener("click", () => {editarEmpleado();});
@@ -201,20 +295,29 @@ const Btn3 = document.getElementById("editar");
 
 
 
-const pagarSueldoEmpleado = () => {
-    const empleadoBuscado = empleadoExiste();
-    if (!empleadoBuscado) return;
-
-    let monto = parseFloat(prompt("Ingrese el monto a depositar del empleado"));
-
-    if (isNaN(monto)) {
-    return alert("Debe ingresa un valor numérico");
-    }
-
-    empleadoBuscado.pagarSueldo(monto);
-
-    mostrarEmpleados(empleados);
-};
+    const pagarSueldoEmpleado = () => {
+        const empleadoBuscado = empleadoExiste();
+        if (!empleadoBuscado) return;
+    
+        Swal.fire({
+            title: "Ingrese el monto a depositar del empleado",
+            input: "text",
+            showCancelButton: true,
+            inputValidator: (value) => {
+                if (isNaN(parseFloat(value))) {
+                    return "Debe ingresar un valor numérico";
+                }
+            },
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const monto = parseFloat(result.value);
+                empleadoBuscado.pagarSueldo(monto);
+    
+                localStorage.setItem("empleados", JSON.stringify(empleados));
+                mostrarEmpleados(empleados);
+            }
+        });
+    };
 
 
 
@@ -235,8 +338,12 @@ const empleadoExiste = () => {
 
     if (indice === -1) {
     
-    return alert(`El empleado ${nombreEmpleado} no existe`);
+    return Swal.fire("Error", `El empleado ${nombreEmpleado} no existe`, "error");
     }
 
     return empleados[indice];
 };
+
+
+
+
