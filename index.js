@@ -79,6 +79,7 @@ mostrarEmpleados(empleados);
 
 
 
+
 const enJson = JSON.stringify(empleados);
 
 localStorage.setItem("empleados", enJson);
@@ -89,26 +90,38 @@ const miObjeto = JSON.parse(jsonData);
 
 const contenedor = document.getElementById("contenedorDatos");
 
+const mostrarEmpleadosEnUI = (empleados) => {
+    const contenedor = document.getElementById("contenedorDatos");
+    contenedor.innerHTML = "";
 
 
-document.addEventListener("DOMContentLoaded", function () {
-    
-    miObjeto.forEach(empleado => {
-        const elemento = document.createElement('p');
-        elemento.textContent = `${empleado.nombre} ${empleado.puesto} ${empleado.edad} ${empleado.sueldo}`;
-        contenedor.appendChild(elemento);
+};
+
+
+
+
+const obtenerEmpleadosDesdeLocalStorage = () => {
+    const jsonData = localStorage.getItem("empleados");
+    const empleados = JSON.parse(jsonData) || [];
+    return empleados;
+};
+
+document.addEventListener("DOMContentLoaded", () => {
+    const empleados = obtenerEmpleadosDesdeLocalStorage();
+    mostrarEmpleadosEnUI(empleados);
+
+    empleados.forEach((objeto) => {
+        const nombreCompleto = `${objeto.nombre} ${objeto.puesto} ${objeto.edad}`;
+        const textoParrafo = `${nombreCompleto}.`;
+        const p = document.createElement('p');
+        p.textContent = textoParrafo;
+        contenedor.appendChild(p);
     });
 });
 
-const cargarEmpleados = () => {
-    document.addEventListener("DOMContentLoaded", () => {
-        miObjeto.forEach(empleado => {
-        const elemento = document.createElement('p');
-        elemento.textContent = `${empleado.nombre} ${empleado.puesto} ${empleado.edad} ${empleado.sueldo}`;
-        contenedor.appendChild(elemento);
-    });
-    });
-};
+
+
+
 
 
 
@@ -274,7 +287,10 @@ const editarEmpleado = () => {
                     });
                     break;
                 default:
-                    alert("Ingrese una opción correcta");
+                    Swal.fire({
+                        title: "Ingrese una opción correcta",
+                        input: "text",
+                    })
             }
         }
     });
@@ -343,7 +359,4 @@ const empleadoExiste = () => {
 
     return empleados[indice];
 };
-
-
-
 
