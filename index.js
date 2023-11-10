@@ -190,34 +190,36 @@ const Btn2 = document.getElementById("eliminar");
     Btn2.addEventListener("click", () => {eliminarEmpleado();});
 
 // Función para eliminar empleados
-const eliminarEmpleado = () => {
-    const empleadoBuscado = empleadoExiste();
+const eliminarEmpleado = async () => {
+    try {
+        const empleadoBuscado = await empleadoExiste();
 
-    if (!empleadoBuscado) return;
+        if (!empleadoBuscado) return;
 
-    Swal.fire({
-        title: `¿Estás seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`,
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Sí, eliminar",
-        cancelButtonText: "Cancelar",
-    }).then((result) => {
+        const result = await Swal.fire({
+            title: `¿Estás seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonText: "Sí, eliminar",
+            cancelButtonText: "Cancelar",
+        });
+
         if (result.isConfirmed) {
             empleados = empleados.filter(
                 (empleado) =>
                     empleado.nombre.toLowerCase() !== empleadoBuscado.nombre.toLowerCase()
             );
             mostrarEmpleados(empleados);
-            Swal.fire("Eliminado", `El empleado ${empleadoBuscado.nombre} ha sido eliminado.`, "success");
+            await Swal.fire("Eliminado", `El empleado ${empleadoBuscado.nombre} ha sido eliminado.`, "success");
             localStorage.setItem("empleados", JSON.stringify(empleados));
         } else {
-            Swal.fire("Cancelado", "Eliminación cancelada", "info");
+            await Swal.fire("Cancelado", "Eliminación cancelada", "info");
         }
-    });
-
-    localStorage.setItem("empleados", JSON.stringify(empleados))
+    } catch (error) {
+        // Manejar el error (puede ser un mensaje como "Empleado no encontrado" o "Acción cancelada")
+        console.error(error);
+    }
 };
-
 
 const editarEmpleado = () => {
     const empleadoBuscado = empleadoExiste();
