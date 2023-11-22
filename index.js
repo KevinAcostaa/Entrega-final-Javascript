@@ -1,7 +1,5 @@
 
 
-
-
 // Hacemos una clase empleado y/o function constructora
 class Empleado {
     constructor(nombre, puesto, edad, sueldo = 0) {
@@ -79,7 +77,6 @@ mostrarEmpleados(empleados);
 
 
 
-
 const enJson = JSON.stringify(empleados);
 
 localStorage.setItem("empleados", enJson);
@@ -90,39 +87,28 @@ const miObjeto = JSON.parse(jsonData);
 
 const contenedor = document.getElementById("contenedorDatos");
 
-const mostrarEmpleadosEnUI = (empleados) => {
-    const contenedor = document.getElementById("contenedorDatos");
-    contenedor.innerHTML = "";
 
 
-};
+// document.addEventListener("DOMContentLoaded", function () {
+    
+//     miObjeto.forEach(empleado => {
+//         const elemento = document.createElement('p');
+//         elemento.textContent = `${empleado.nombre} ${empleado.puesto} ${empleado.edad} ${empleado.sueldo}`;
+//         contenedor.appendChild(elemento);
+//     });
+// });
 
-
-
-
-const obtenerEmpleadosDesdeLocalStorage = () => {
-    const jsonData = localStorage.getItem("empleados");
-    const empleados = JSON.parse(jsonData) || [];
-    return empleados;
-};
-
-document.addEventListener("DOMContentLoaded", () => {
-    const empleados = obtenerEmpleadosDesdeLocalStorage();
-    mostrarEmpleadosEnUI(empleados);
-
-    empleados.forEach((objeto) => {
-        const nombreCompleto = `${objeto.nombre} ${objeto.puesto} ${objeto.edad}`;
-        const textoParrafo = `${nombreCompleto}.`;
-        const p = document.createElement('p');
-        p.textContent = textoParrafo;
-        contenedor.appendChild(p);
+function ejecutarFuncion() {
+    document.addEventListener("DOMContentLoaded", () => {
+        miObjeto.forEach(empleado => {
+        const elemento = document.createElement('p');
+        elemento.textContent = `${empleado.nombre} ${empleado.puesto} ${empleado.edad} ${empleado.sueldo}`;
+        contenedor.appendChild(elemento);
     });
-});
+    });
+};
 
-
-
-
-
+let  cargarEmpleados = ejecutarFuncion();
 
 
 const agregarBtn = document.getElementById("agregar");
@@ -190,36 +176,46 @@ const Btn2 = document.getElementById("eliminar");
     Btn2.addEventListener("click", () => {eliminarEmpleado();});
 
 // Función para eliminar empleados
-const eliminarEmpleado = async () => {
-    try {
-        const empleadoBuscado = await empleadoExiste();
-
-        if (!empleadoBuscado) return;
-
-        const result = await Swal.fire({
-            title: `¿Estás seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`,
-            icon: "warning",
-            showCancelButton: true,
-            confirmButtonText: "Sí, eliminar",
-            cancelButtonText: "Cancelar",
-        });
-
+const eliminarEmpleado = () => {
+    Swal.fire({
+        title: "Ingrese el nombre del empleado",
+        input: "text",
+        showCancelButton: true,
+        inputValidator: (value) => {
+            //Buscar al empleado si existe
+        },
+    }).then((result) => {
         if (result.isConfirmed) {
-            empleados = empleados.filter(
-                (empleado) =>
-                    empleado.nombre.toLowerCase() !== empleadoBuscado.nombre.toLowerCase()
-            );
-            mostrarEmpleados(empleados);
-            await Swal.fire("Eliminado", `El empleado ${empleadoBuscado.nombre} ha sido eliminado.`, "success");
-            localStorage.setItem("empleados", JSON.stringify(empleados));
-        } else {
-            await Swal.fire("Cancelado", "Eliminación cancelada", "info");
+            const nombreEmpleado = result.value;
+            const empleadoBuscado = empleados.find(e => e.nombre.toLowerCase() == String(nombreEmpleado).toLowerCase())
+            if (!empleadoBuscado) {
+                Swal.fire("Error", `El empleado ${nombreEmpleado} no existe`, "error");
+                return;
+            }
+            Swal.fire({
+                title: `¿Estás seguro que deseas eliminar el empleado ${empleadoBuscado.nombre} ?`,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: "Sí, eliminar",
+                cancelButtonText: "Cancelar",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    empleados = empleados.filter(
+                        (empleado) =>
+                            empleado.nombre.toLowerCase() !== empleadoBuscado.nombre.toLowerCase()
+                    );
+                    mostrarEmpleados(empleados);
+                    Swal.fire("Eliminado", `El empleado ${empleadoBuscado.nombre} ha sido eliminado.`, "success");
+                    localStorage.setItem("empleados", JSON.stringify(empleados));
+                } else {
+                    Swal.fire("Cancelado", "Eliminación cancelada", "info");
+                }
+            });
         }
-    } catch (error) {
-        // Manejar el error (puede ser un mensaje como "Empleado no encontrado" o "Acción cancelada")
-        console.error(error);
-    }
+    });
+    //localStorage.setItem("empleados", JSON.stringify(empleados))
 };
+
 
 const editarEmpleado = () => {
     const empleadoBuscado = empleadoExiste();
@@ -289,10 +285,7 @@ const editarEmpleado = () => {
                     });
                     break;
                 default:
-                    Swal.fire({
-                        title: "Ingrese una opción correcta",
-                        input: "text",
-                    })
+                    alert("Ingrese una opción correcta");
             }
         }
     });
@@ -347,18 +340,19 @@ const Btn4 = document.getElementById("pagarS");
 
 const empleadoExiste = () => {
 
-    let nombreEmpleado = prompt("Ingrese el nombre del empleado");
+    //let nombreEmpleado = prompt("Ingrese el nombre del empleado");
 
-
-    let indice = empleados.findIndex(
-    (empleado) => empleado.nombre.toLowerCase() === nombreEmpleado.toLowerCase()
-    );
-
-    if (indice === -1) {
     
-    return Swal.fire("Error", `El empleado ${nombreEmpleado} no existe`, "error");
-    }
 
-    return empleados[indice];
+    // let indice = empleados.findIndex(
+    // (empleado) => empleado.nombre.toLowerCase() === nombreEmpleado.toLowerCase()
+    // );
+
+    // if (indice === -1) {
+    
+    // return Swal.fire("Error", `El empleado ${nombreEmpleado} no existe`, "error");
+    // }
+
+    // return empleados[indice];
 };
 
