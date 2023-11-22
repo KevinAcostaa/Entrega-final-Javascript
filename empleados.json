@@ -1,0 +1,7 @@
+{
+    "empleados" : [
+        {"nombre" : "Kevin", "puesto" : "Jr", "edad" : 25, "sueldo" : 0},
+        {"nombre" : "Juan", "puesto" : "Jr", "edad" : 30, "sueldo" : 0},
+        {"nombre" : "Maria", "puesto" : "Senior", "edad" : 40, "sueldo" : 0}
+    ]
+}
