@@ -1,3 +1,4 @@
+
 "use strict";
 
 // Hacemos una clase empleado y/o function constructora
